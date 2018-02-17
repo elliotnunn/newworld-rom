@@ -1,0 +1,7 @@
+.DS_Store
+parcels
+tbxi
+lzss
+__pycache__
+*.patch
+*.hqx
