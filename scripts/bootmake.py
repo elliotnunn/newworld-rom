@@ -17,13 +17,24 @@ COMPATIBLE = [
     "MacRISC",
     # "MacRISC2",
     # "MacRISC3",
+    # "MacRISC4",
 ]
 
 # Changes to the Forth boot script, all off by default
 DELETE_MODEL_CHECK = False
 DELETE_CHECKSUM_CHECK = False
-MAC_MINI_PRETEND_TO_BE_POWERBOOK = False
 G4_FIX = False
+
+# *After* OF has loaded this file, set the "model" property?
+SET_MODEL_PROPERTY = ''
+# SET_MODEL_PROPERTY = 'PowerMac5,1' # Cube
+
+# ...and the "compatible" property? (empty strings not counted)
+SET_COMPATIBLE_PROPERTY = [x for x in [
+    # SET_MODEL_PROPERTY,
+    # *COMPATIBLE,
+    # 'Power Macintosh',
+] if x]
 
 # Adds code to set the AAPL,debug property early in the boot script
 DEBUG_PROPERTY = 0
@@ -88,14 +99,23 @@ device-end
 \ END DEBUG_PROPERTY
 """ % DEBUG_PROPERTY
 
-if MAC_MINI_PRETEND_TO_BE_POWERBOOK: BOOT_SCRIPT += """
-\ MAC_MINI_PRETEND_TO_BE_POWERBOOK
+if SET_MODEL_PROPERTY: BOOT_SCRIPT += """
+\ SET_MODEL_PROPERTY
 dev /
-" PowerBook4,3" encode-string " model" property
-" PowerBook4,3" encode-string " MacRISC" encode-string encode+ " MacRiSC2" encode-string encode+ " MacRISC3" encode-string encode+ " Power Macintosh" encode-string encode+ " compatible" property
+" %s" encode-string " model" property
 device-end
-\ END MAC_MINI_PRETEND_TO_BE_POWERBOOK
-"""
+\ END SET_MODEL_PROPERTY
+""" % SET_MODEL_PROPERTY
+
+if SET_COMPATIBLE_PROPERTY:
+    BOOT_SCRIPT += "\ SET_COMPATIBLE_PROPERTY\n"
+    BOOT_SCRIPT += "dev /\n"
+    BOOT_SCRIPT += '" %s" encode-string' % SET_COMPATIBLE_PROPERTY[0]
+    for x in SET_COMPATIBLE_PROPERTY[1:]:
+        BOOT_SCRIPT += ' " %s" encode-string encode+' % x
+    BOOT_SCRIPT += ' " compatible" property\n'
+    BOOT_SCRIPT += 'device-end\n'
+    BOOT_SCRIPT += '\ END SET_COMPATIBLE_PROPERTY\n'
 
 if G4_FIX: BOOT_SCRIPT += """
 \ G4_FIX:
