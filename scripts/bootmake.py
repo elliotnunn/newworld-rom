@@ -15,29 +15,29 @@ def html_escape_forth(f):
 # The COMPATIBLE field at the top of the script
 COMPATIBLE = [
     "MacRISC",
-    # "MacRISC2",
-    # "MacRISC3",
-    # "MacRISC4",
+    "MacRISC2",
+    "MacRISC3",
+    "MacRISC4",
 ]
 
 # Changes to the Forth boot script, all off by default
 DELETE_MODEL_CHECK = False
 DELETE_CHECKSUM_CHECK = False
-G4_FIX = False
+G4_FIX = True
 
 # *After* OF has loaded this file, set the "model" property?
 SET_MODEL_PROPERTY = ''
-# SET_MODEL_PROPERTY = 'PowerMac5,1' # Cube
+SET_MODEL_PROPERTY = 'PowerMac5,1' # Cube
 
 # ...and the "compatible" property? (empty strings not counted)
 SET_COMPATIBLE_PROPERTY = [x for x in [
-    # SET_MODEL_PROPERTY,
-    # *COMPATIBLE,
-    # 'Power Macintosh',
+    SET_MODEL_PROPERTY,
+    *COMPATIBLE,
+    'Power Macintosh',
 ] if x]
 
 SET_PRIM_INFO = None
-# SET_PRIM_INFO = ['000000ff', '0000002c', '00030d40', '0001e705', '00001400', '00000000', '0000260d', '46000270'] # for mini
+SET_PRIM_INFO = ['000000ff', '0000002c', '00030d40', '0001e705', '00001400', '00000000', '0000260d', '46000270'] # for mini
 
 # Adds code to set the AAPL,debug property early in the boot script
 DEBUG_PROPERTY = 0
