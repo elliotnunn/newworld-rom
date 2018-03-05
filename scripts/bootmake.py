@@ -36,6 +36,9 @@ SET_COMPATIBLE_PROPERTY = [x for x in [
     # 'Power Macintosh',
 ] if x]
 
+SET_PRIM_INFO = None
+# SET_PRIM_INFO = ['000000ff', '0000002c', '00030d40', '0001e705', '00001400', '00000000', '0000260d', '46000270'] # for mini
+
 # Adds code to set the AAPL,debug property early in the boot script
 DEBUG_PROPERTY = 0
 # DEBUG_PROPERTY |= 0x00000001 # Print general informative messages.
@@ -90,6 +93,16 @@ info_size = len(tbxi)
 # Assemble the CHRP-BOOT text for Open Firmware to parse.
 
 BOOT_SCRIPT = ''
+
+if SET_PRIM_INFO:
+    BOOT_SCRIPT += "\ SET_PRIM_INFO\n"
+    BOOT_SCRIPT += "dev via-pmu dev power-mgt\n"
+    BOOT_SCRIPT += '%s encode-int\n' % SET_PRIM_INFO[0]
+    for x in SET_PRIM_INFO[1:]:
+        BOOT_SCRIPT += '%s encode-int encode+\n' % x
+    BOOT_SCRIPT += '" prim-info" property\n'
+    BOOT_SCRIPT += 'device-end\n'
+    BOOT_SCRIPT += '\ END SET_PRIM_INFO\n'
 
 if DEBUG_PROPERTY: BOOT_SCRIPT += """
 \ DEBUG_PROPERTY
