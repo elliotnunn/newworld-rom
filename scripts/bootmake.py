@@ -24,6 +24,7 @@ COMPATIBLE = [
 DELETE_MODEL_CHECK = False
 DELETE_CHECKSUM_CHECK = False
 G4_FIX = False
+FAKE_EARLY_G4 = True
 
 # *After* OF has loaded this file, set the "model" property?
 SET_MODEL_PROPERTY = ''
@@ -160,6 +161,14 @@ if G4_FIX: BOOT_SCRIPT += """
   device-end
 then
 \ END G4_FIX
+"""
+
+if FAKE_EARLY_G4: BOOT_SCRIPT += """
+\ FAKE_EARLY_G4:
+dev /cpus/PowerPC,G4
+800c0000 encode-int " cpu-version" property
+device-end
+\ END FAKE_EARLY_G4
 """
 
 BOOT_SCRIPT += """
