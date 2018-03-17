@@ -71,22 +71,36 @@ DATA_OFFSET = 0x5000
 
 # Load the two binary blobs, and save their offsets and sizes.
 
-out_path, elf_path, parcels_path = argv[1:]
+out_path, elf_path, payload_path = argv[1:]
 
 
 tbxi = bytearray(DATA_OFFSET)
 
-for x in ['elf', 'parcels']:
+for x in ['elf', 'payload']:
     locals()[x + '_offset'] = len(tbxi)
     with open(locals()[x + '_path'], 'rb') as f:
         data = f.read()
         while len(data) % 4:
             data.extend(b'\x00')
     locals()[x + '_size'] = len(data)
+    locals()[x + '_data'] = data
 
     tbxi.extend(data)
 
 info_size = len(tbxi)
+
+
+
+# Put the payload in the correct device tree property.
+
+if b'AAPL,toolbox-parcels' in elf_data:
+    # Used by v8-10 booters
+    payload_type = 'parcels'
+    payload_prop_name = 'AAPL,toolbox-parcels'
+else:
+    # Used by v1 LZSSed-ROM-image booters, and by v3-7 parcels-based booters
+    payload_type = 'lzss'
+    payload_prop_name = 'AAPL,toolbox-image,lzss'
 
 
 
@@ -219,9 +233,9 @@ pagesz 1- constant pagesz-1
 h# {elf_offset:06X} constant elf-offset
 h# {elf_size:06X} constant elf-size
 elf-size pagesz-1 + pagemask and constant elf-pages
-h# {parcels_offset:06X} constant parcels-offset
-h# {parcels_size:06X} constant parcels-size
-parcels-size pagesz-1 + pagemask and constant parcels-pages
+h# {payload_offset:06X} constant {payload_type}-offset
+h# {payload_size:06X} constant {payload_type}-size
+{payload_type}-size pagesz-1 + pagemask and constant {payload_type}-pages
 h# {info_size:06X} constant info-size
 info-size pagesz-1 + pagemask and constant info-pages
 0 value load-base-claim
@@ -233,25 +247,25 @@ info-size pagesz-1 + pagemask and constant info-pages
     info-pages 1000 claim-virt to info-base
     load-base info-base info-pages 10 do-map   then
 \ allocate room for both images
-parcels-pages 400000 claim-mem constant rom-phys parcels-pages 1000 claim-virt constant rom-virt rom-phys rom-virt parcels-pages 10 do-map  
+{payload_type}-pages 400000 claim-mem constant rom-phys {payload_type}-pages 1000 claim-virt constant rom-virt rom-phys rom-virt {payload_type}-pages 10 do-map  
 elf-pages 1000 claim-mem constant elf-phys   elf-pages 1000 claim-virt constant elf-virt
 elf-phys elf-virt elf-pages 10 do-map    info-base elf-offset + elf-virt elf-size move  debug? if cr ." elf-phys,elf-virt,elf-pages: " elf-phys u. ." , " elf-virt u. ." , " elf-pages u. then
 \ copy the compressed image
 debug? if cr ." copying compressed ROM image" then
-rom-virt parcels-pages 0 fill
-info-base parcels-offset + rom-virt parcels-size move
+rom-virt {payload_type}-pages 0 fill
+info-base {payload_type}-offset + rom-virt {payload_type}-size move
 'release-load-area 0= if
     info-base info-pages do-unmap      load-base-claim ?dup if info-pages release-mem then
   then
-debug? if cr ." MacOS-ROM phys,virt,size: " rom-phys u. ." , " rom-virt u. ." , " parcels-size u. then
+debug? if cr ." MacOS-ROM phys,virt,size: " rom-phys u. ." , " rom-virt u. ." , " {payload_type}-size u. then
 \ create the actual property
 debug? if cr ." finding/creating '/rom/macos' package" then
 device-end 0 to my-self
 " /rom" find-device
 " macos" ['] find-device catch if 2drop new-device " macos" device-name finish-device then
 " /rom/macos" find-device
-debug? if cr ." creating 'AAPL,toolbox-parcels' property" then
-rom-virt encode-int parcels-size encode-int encode+ " AAPL,toolbox-parcels" property
+debug? if cr ." creating '{payload_prop_name}' property" then
+rom-virt encode-int {payload_type}-size encode-int encode+ " {payload_prop_name}" property
 device-end
 debug? if cr ." copying MacOS.elf to load-base" then
 'release-load-area if
