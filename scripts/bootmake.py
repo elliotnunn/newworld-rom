@@ -65,7 +65,7 @@ DEBUG_PROPERTY = 0
 # DEBUG_PROPERTY |= 0x40000000 # Halt after end of FCode (useful if outputting to screen).
 
 # The OF-friendly parts of the file are padded out to 20k with nulls
-DATA_OFFSET = 0x5000
+DATA_OFFSET = 0x4000
 
 
 
