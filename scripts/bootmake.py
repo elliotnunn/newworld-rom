@@ -14,14 +14,12 @@ def html_escape_forth(f):
 
 # The COMPATIBLE field at the top of the script
 COMPATIBLE = [
-    "MacRISC",
-    "MacRISC2",
-    "MacRISC3",
-    "MacRISC4",
+    "PowerMac10,1",
+    "PowerMac10,2",
 ]
 
 # Changes to the Forth boot script, all off by default
-DELETE_MODEL_CHECK = False
+DELETE_MODEL_CHECK = True
 DELETE_CHECKSUM_CHECK = False
 G4_FIX = True
 
@@ -32,7 +30,8 @@ SET_MODEL_PROPERTY = 'PowerMac5,1' # Cube
 # ...and the "compatible" property? (empty strings not counted)
 SET_COMPATIBLE_PROPERTY = [x for x in [
     SET_MODEL_PROPERTY,
-    *COMPATIBLE,
+    "MacRISC",
+    "MacRISC2",
     'Power Macintosh',
 ] if x]
 
