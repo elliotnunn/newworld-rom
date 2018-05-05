@@ -15,9 +15,9 @@ def html_escape_forth(f):
 # The COMPATIBLE field at the top of the script
 COMPATIBLE = [
     "MacRISC",
-    # "MacRISC2",
-    # "MacRISC3",
-    # "MacRISC4",
+    "MacRISC2",
+    "MacRISC3",
+    "MacRISC4",
 ]
 
 # Changes to the Forth boot script, all off by default
