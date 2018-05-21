@@ -8,7 +8,14 @@ Building
 
 A basic Unix toolchain is required.
 
-	make tbxi
+	make tbxi.hqx
+
+Instead of using the included 4 MB ROM, you can uncomment some code in the makefile to trigger a build from https://github.com/elliotnunn/powermac-rom
+
+The makefile also helps you to test your build:
+
+	make test-qemu
+	make test-fw
 
 Patching
 --------
