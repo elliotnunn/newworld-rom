@@ -44,7 +44,7 @@ test-fw: tbxi.hqx
 	# START THE TEST MACHINE IN TARGET DISK MODE
 	rm -f "/Volumes/$(REMOTE_DISK_NAME)/System Folder/Mac OS ROM"
 	binhex -o "/Volumes/$(REMOTE_DISK_NAME)/System Folder/Mac OS ROM" $<
-	diskutil unmountDisk force /dev/`diskutil info /Volumes/Alpha/ | grep "Part of Whole" | sed 's/.*:\s*//'`
+	diskutil unmountDisk force /dev/`diskutil info /Volumes/$(REMOTE_DISK_NAME)/ | grep "Part of Whole" | sed 's/.*:\s*//'`
 	tput bel && say "ROM copied."
 
 test-netfw: tbxi.hqx
